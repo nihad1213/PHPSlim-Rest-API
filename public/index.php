@@ -31,4 +31,25 @@ $app->get('/api/products', function (Request $request, Response $response) {
 
 });
 
+$app->get('/api/products/{id: [0-9]+}', function (Request $request, Response $response, array $args) {
+
+    $id = $args['id'];
+
+    $repository = $this->get(App\Repositories\ProductRepository::class);
+    $product = $repository->getByID((int) $id);
+
+    if ($product === false) {
+        $error = json_encode(["error" => "ID doesnt match"]);
+        $response->getBody()->write($error);
+        return $response->withHeader('Content-Type', 'application/json')
+                        ->withStatus(404);
+    }
+
+    $body = json_encode($product);
+
+    $response->getBody()->write($body);
+    return $response -> withHeader('Content-Type', 'application/json');
+
+});
+
 $app->run();
